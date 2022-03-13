@@ -5,13 +5,25 @@
     var group;
     var panel;
     var window;
+    var inputField;
 
-    window = new Window("dialog", windowTitle);
+    window = new Window("dialog", windowTitle, undefined, { closeButton:true });
+    window.alignChildren = "fill";
+
     panel = window.add("panel");
     group = panel.add("group");
     var btnFolderOutput = group.add("button", undefined, "Folder...")
     var txtFolderOutput = group.add("statictext", undefined, "", { truncate: "middle" });
     txtFolderOutput.preferredSize = [200,-1];
+
+    panel = window.add("panel", undefined, "Options");
+    panel.alignChildren = "fill"
+    group = panel.add("group");
+    group.alignment = "left";
+    group.add("statictext", undefined, "Balls amount per color:")
+    inputField = group.add ("edittext", undefined, "10");
+    inputField.preferredSize = [35,-1];
+
     group = window.add("group");
     group.alignment = "center";
     var btnOk = group.add("button", undefined, "Ok");
@@ -24,6 +36,10 @@
         }
     }
     btnOk.onClick = function(){
+        if(!selectedFolder){
+            alert("Select a folder to export the files!", windowTitle, true);
+            return;
+        }
         window.close(1);
     }
     btnCancel.onClick = function(){
@@ -31,22 +47,29 @@
     }
 
     if(window.show() == 1){
-        if(selectedFolder){
-            Process(selectedFolder);
+        
+        var ballAmount = parseInt(inputField.text);
+        
+        if(ballAmount > 10){
+            ballAmount = 10;
         }
-        else{
-            alert("Select a folder to export the files!", windowTitle, true);
+
+        if(ballAmount < 1){
+            ballAmount = 1;
         }
+
+        Process(selectedFolder, ballAmount);
     }
+
+    //alert("Done", windowTitle, false);
 
 })()
 
-function Process(selectedFolder){
+function Process(selectedFolder, numberAmount){
 
     var doc = app.activeDocument;
     var ballsGroup = doc.layerSets.getByName('Balls');
     var titleElement = doc.layers.getByName('Text');
-    var numberAmount = 2;
     Progress("Reading folder...");
     Progress.Set(numberAmount * ballsGroup.layers.length);
 
