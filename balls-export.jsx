@@ -82,19 +82,21 @@ function Process(selectedFolder, numberAmount){
     }
 
     //Set layers to export
-    var num = 1;
+    var num = 0;
 
     for (var ball = 0; ball < ballsGroup.layers.length; ball++) {
         
         ballsGroup.layers[ball].visible = true;
         
         for (var number = 0; number < numberAmount; number++) {
-
-            titleElement.textItem.contents = num;
-            Progress.Message(selectedFolder + "/ball-" + num + ".png");
-            ExportPNG(selectedFolder.fullName, "ball-" + num);
+            
+            if(num != 0){
+                titleElement.textItem.contents = num;
+                Progress.Message(selectedFolder + "/ball-" + num + ".png");
+                ExportPNG(selectedFolder.fullName, "ball-" + num);
+                Progress.Increment();
+            }
             num++;
-            Progress.Increment();
         }
         
         ballsGroup.layers[ball].visible = false;
