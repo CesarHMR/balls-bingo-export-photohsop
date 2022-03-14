@@ -20,7 +20,7 @@
     panel.alignChildren = "fill"
     group = panel.add("group");
     group.alignment = "left";
-    group.add("statictext", undefined, "Balls amount per color:")
+    group.add("statictext", undefined, "Balls amount per variant:")
     inputField = group.add ("edittext", undefined, "10");
     inputField.preferredSize = [35,-1];
 
@@ -90,12 +90,11 @@ function Process(selectedFolder, numberAmount){
         
         for (var number = 0; number < numberAmount; number++) {
             
-            if(num != 0){
-                titleElement.textItem.contents = num;
-                Progress.Message(selectedFolder + "/ball-" + num + ".png");
-                ExportPNG(selectedFolder.fullName, "ball-" + num);
-                Progress.Increment();
-            }
+            titleElement.textItem.contents = num;
+            Progress.Message(selectedFolder + "/ball-" + num + ".png");
+            ExportPNG(selectedFolder.fullName, "ball-" + num);
+            Progress.Increment();
+            
             num++;
         }
         
