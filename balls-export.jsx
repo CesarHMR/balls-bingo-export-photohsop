@@ -113,7 +113,8 @@ function Execute(selectedFolder, numberAmount){
             
             titleElement.textItem.contents = num;
             Progress.Message(selectedFolder + "/ball " + num);
-            ExportPNG(selectedFolder.fullName, num);
+            var zero = num < 10 ? "0" : "";
+            ExportPNG(selectedFolder.fullName, "ball_" + zero + num);
             Progress.Increment();
             
             num++;
