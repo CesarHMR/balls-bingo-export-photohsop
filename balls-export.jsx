@@ -112,8 +112,8 @@ function Execute(selectedFolder, numberAmount){
         for (var number = 0; number < numberAmount; number++) {
             
             titleElement.textItem.contents = num;
-            Progress.Message(selectedFolder + "/ball-" + num + ".png");
-            ExportPNG(selectedFolder.fullName, "ball-" + num);
+            Progress.Message(selectedFolder + "/ball " + num);
+            ExportPNG(selectedFolder.fullName, num);
             Progress.Increment();
             
             num++;
