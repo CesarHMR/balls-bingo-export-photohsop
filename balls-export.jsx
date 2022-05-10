@@ -1,3 +1,5 @@
+const { func } = require("prop-types");
+
 (function CreateWindow(){
 
     var windowTitle = "Bingo Balls Export"
@@ -21,11 +23,20 @@
     //Options Panel
     panel = window.add("panel", undefined, "Options");
     panel.alignChildren = "fill"
+
+    //Balls amount
+    // group = panel.add("group");
+    // group.alignment = "left";
+    // group.add("statictext", undefined, "Balls amount per variant:")
+    // inputField = group.add ("edittext", undefined, "10");
+    // inputField.preferredSize = [35,-1];
+
+    //Checkbox
     group = panel.add("group");
     group.alignment = "left";
-    group.add("statictext", undefined, "Balls amount per variant:")
-    inputField = group.add ("edittext", undefined, "10");
-    inputField.preferredSize = [35,-1];
+    group.add("statictext", undefined, "Unique text for each group")
+    var checkbox = group.add ("checkbox", undefined);
+    checkbox.preferredSize = [35,-1];
 
     //Buttons
     group = window.add("group");
@@ -54,17 +65,7 @@
     //On closed window
     if(window.show() == 1){
         
-        var ballAmount = parseInt(inputField.text);
-        
-        if(ballAmount > 10){
-            ballAmount = 10;
-        }
-
-        if(ballAmount < 1){
-            ballAmount = 1;
-        }
-
-        Execute(selectedFolder, ballAmount);
+        Execute(selectedFolder, 10, checkbox);
     }
 })()
 
@@ -93,36 +94,7 @@ function Execute(selectedFolder, numberAmount){
     Progress("Reading folder...");
     Progress.Set(numberAmount * ballsGroup.layers.length);
 
-    //Set initial visibility
-    ballsGroup.visible = true;
-    titleElement.visible = true;
-
-    for (i = 0; i < ballsGroup.layers.length; i++)
-    {
-        ballsGroup.layers[i].visible = false;
-    }
-
-    //Set layers to export
-    var num = 0;
-
-    for (var ball = 0; ball < ballsGroup.layers.length; ball++) {
-        
-        ballsGroup.layers[ball].visible = true;
-        
-        for (var number = 0; number < numberAmount; number++) {
-            
-            titleElement.textItem.contents = num;
-            Progress.Message(selectedFolder + "/ball " + num);
-            var zero = num < 10 ? "0" : "";
-            ExportPNG(selectedFolder.fullName, "ball_" + zero + num);
-            Progress.Increment();
-            
-            num++;
-        }
-        
-        ballsGroup.layers[ball].visible = false;
-
-    }
+    ExecuteSingleText();
 
     Progress.Close();
 
@@ -153,6 +125,42 @@ function Execute(selectedFolder, numberAmount){
         window.show();
         window.update();
     }
+}
+
+function ExecuteSingleText(){
+        //Set initial visibility
+        ballsGroup.visible = true;
+        titleElement.visible = true;
+    
+        for (i = 0; i < ballsGroup.layers.length; i++)
+        {
+            ballsGroup.layers[i].visible = false;
+        }
+    
+        //Set layers to export
+        var num = 0;
+    
+        for (var ball = 0; ball < ballsGroup.layers.length; ball++) {
+            
+            ballsGroup.layers[ball].visible = true;
+            
+            for (var number = 0; number < numberAmount; number++) {
+                
+                titleElement.textItem.contents = num;
+                Progress.Message(selectedFolder + "/ball " + num);
+                var zero = num < 10 ? "0" : "";
+                ExportPNG(selectedFolder.fullName, "ball_" + zero + num);
+                Progress.Increment();
+                
+                num++;
+            }
+            
+            ballsGroup.layers[ball].visible = false;
+        }
+}
+
+function ExecuteMultiText(){
+    //Implement!!!
 }
 
 function ExportPNG(selectedFolder, fileName)
