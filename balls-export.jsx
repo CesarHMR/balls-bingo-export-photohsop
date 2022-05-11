@@ -1,188 +1,238 @@
-const { func } = require("prop-types");
-
 (function CreateWindow(){
 
     var windowTitle = "Bingo Balls Export"
-    var selectedFolder;
-    var group;
-    var panel;
-    var window;
-    var inputField;
+    var selectedFolder
+    var group
+    var panel
+    var window
+    //var inputField
 
     //Create Window
-    window = new Window("dialog", windowTitle, undefined, { closeButton:true });
-    window.alignChildren = "fill";
+    window = new Window("dialog", windowTitle, undefined, { closeButton:true })
+    window.alignChildren = "fill"
 
     //Folder Panel
-    panel = window.add("panel");
-    group = panel.add("group");
+    panel = window.add("panel")
+    group = panel.add("group")
     var btnFolderOutput = group.add("button", undefined, "Folder...")
-    var txtFolderOutput = group.add("statictext", undefined, "", { truncate: "middle" });
-    txtFolderOutput.preferredSize = [200,-1];
+    var txtFolderOutput = group.add("statictext", undefined, "", { truncate: "middle" })
+    txtFolderOutput.preferredSize = [200,-1]
 
     //Options Panel
-    panel = window.add("panel", undefined, "Options");
+    panel = window.add("panel", undefined, "Options")
     panel.alignChildren = "fill"
 
     //Balls amount
-    // group = panel.add("group");
-    // group.alignment = "left";
+    // group = panel.add("group")
+    // group.alignment = "left"
     // group.add("statictext", undefined, "Balls amount per variant:")
-    // inputField = group.add ("edittext", undefined, "10");
-    // inputField.preferredSize = [35,-1];
+    // inputField = group.add ("edittext", undefined, "10")
+    // inputField.preferredSize = [35,-1]
 
     //Checkbox
-    group = panel.add("group");
-    group.alignment = "left";
+    group = panel.add("group")
+    group.alignment = "left"
     group.add("statictext", undefined, "Unique text for each group")
-    var checkbox = group.add ("checkbox", undefined);
-    checkbox.preferredSize = [35,-1];
+    var checkbox = group.add ("checkbox", undefined)
 
     //Buttons
-    group = window.add("group");
-    group.alignment = "center";
-    var btnOk = group.add("button", undefined, "Ok");
-    var btnCancel = group.add("button", undefined, "Cancel");
+    group = window.add("group")
+    group.alignment = "center"
+    var btnOk = group.add("button", undefined, "Ok")
+    var btnCancel = group.add("button", undefined, "Cancel")
 
     //Buttons interactivity
     btnFolderOutput.onClick = function(){
-        selectedFolder = Folder.selectDialog();
+        selectedFolder = Folder.selectDialog()
         if(selectedFolder){
-            txtFolderOutput.text = selectedFolder.fullName;
+            txtFolderOutput.text = selectedFolder.fullName
         }
     }
     btnOk.onClick = function(){
         if(!selectedFolder){
-            alert("Select a folder to export the files!", windowTitle, true);
-            return;
+            alert("Select a folder to export the files!", windowTitle, true)
+            return
         }
-        window.close(1);
+        window.close(1)
     }
     btnCancel.onClick = function(){
-        window.close(0);
+        window.close(0)
     }
 
     //On closed window
     if(window.show() == 1){
-        
-        Execute(selectedFolder, 10, checkbox);
+        Execute(selectedFolder, checkbox.value)
     }
 })()
 
-function Execute(selectedFolder, numberAmount){
+function Execute(selectedFolder, multipleTextsEnabled){
+    if(app.documents.length == 0){
+        alert("'Active document' not found!\nOpen a document to run the script.", "Balls Export Script", true)
+        return
+    }
+    if(!app.activeDocument.saved){
+        if(confirm("Save document?")){
+            app.activeDocument.save()
+        }
+    }
 
     try{
-        var doc = app.activeDocument;
-        var ballsGroup = doc.layerSets.getByName('Balls');
-        var titleElement = doc.layers.getByName('Text');
+        var ballsGroup = app.activeDocument.layerSets.getByName('Balls')
+        var textsGroup = app.activeDocument.layerSets.getByName('Texts')
     }
     catch(e){
-        if(!doc){
-            alert("'Active document' not found!", "Set Up Error", true);
-            return;
-        }
         if(!ballsGroup){
-            alert("'Balls folder' not found!", "Set Up Error", true);
-            return;
+            alert("'Balls Group' not found!\nSet up the document correctly.", "Balls Export Script", true)
+            return
         }
-        if(!titleElement){
-            alert("'Text Layer' not found!", "Set Up Error", true);
-            return;
+        if(!textsGroup){
+            alert("'Text Group' not found!\nSet up the document correctly.", "Balls Export Script", true)
+            return
         }
     }
 
-    Progress("Reading folder...");
-    Progress.Set(numberAmount * ballsGroup.layers.length);
-
-    ExecuteSingleText();
-
-    Progress.Close();
-
-    function Progress(initialMessage){
+    if(ballsGroup.layers.length == 0){
+        alert("'Balls Group' is empty!\nSet up the document correctly.", "Balls Export Script", true)
+        return
+    }
+    if(textsGroup.layers.length == 0){
+        alert("'Texts Group' is empty!\nSet up the document correctly.", "Balls Export Script", true)
+        return
+    }
+    if(multipleTextsEnabled && textsGroup.layers.length != ballsGroup.layers.length){
+        alert("The amount of elements in 'Balls Group' must be the same as the amount in the 'Texts Group'!\nSet up the document correctly.", "Balls Export Script", true)
+        return
+    }
     
-        var window = new Window("palette", "Exporting Files", undefined, { closeButton: false });
-        var text = window.add("statictext", undefined, initialMessage);
-        text.preferredSize = [450,-1];
-        var bar = window.add("progressbar", undefined, "");
-        bar.preferredSize = [450,-1];
+    var executeData = {selectedFolder: selectedFolder, ballsGroup: ballsGroup, textsGroup: textsGroup}
 
-        Progress.Close = function(){
-            window.close();
+    Progress("Reading folder...")
+    Progress.Set(10 * ballsGroup.layers.length)
+
+    multipleTextsEnabled ? ExecuteMultipleTexts(executeData) : ExecuteSingleText(executeData)
+
+    Progress.Close()
+
+    alert("Done!", "Balls Export Script")
+}
+
+function ExecuteSingleText(executeData){
+
+    var selectedFolder = executeData.selectedFolder
+    var ballsGroup = executeData.ballsGroup
+    var textsGroup = executeData.textsGroup
+    
+    //Set layers visibility
+    ballsGroup.visible = true
+    textsGroup.visible = true
+    textsGroup.layers[0].visible = true
+    
+    for (i = 0; i < ballsGroup.layers.length; i++)
+    {
+        ballsGroup.layers[i].visible = false
+    }
+    
+    //Set layers to export
+    var ballNumber = 0
+    
+    for (var i = 0; i < ballsGroup.layers.length; i++) {
+        
+        ballsGroup.layers[i].visible = true
+        
+        for (var j = 0; j < 10; j++) {
+            
+            textsGroup.layers[0].textItem.contents = ballNumber
+            var ballName = "ball_" + (ballNumber < 10 ? "0" : "") + ballNumber //ball_01.png
+            ExportPNG(selectedFolder.fullName, ballName)
+            Progress.Message(selectedFolder + "/" + ballName)
+            Progress.Increment()
+            
+            ballNumber++
         }
-        Progress.Increment = function(){
-            bar.value ++;
-            window.update();
-        }
-        Progress.Message = function(message){
-            text.text = message
-        }
-        Progress.Set = function(steps){
-            bar.value = 0;
-            bar.minvalue = 0;
-            bar.maxvalue = steps;
-            window.update();
-        }
-        window.show();
-        window.update();
+        
+        ballsGroup.layers[i].visible = false
     }
 }
 
-function ExecuteSingleText(){
-        //Set initial visibility
-        ballsGroup.visible = true;
-        titleElement.visible = true;
+function ExecuteMultipleTexts(executeData){
     
-        for (i = 0; i < ballsGroup.layers.length; i++)
-        {
-            ballsGroup.layers[i].visible = false;
-        }
+    var selectedFolder = executeData.selectedFolder
+    var ballsGroup = executeData.ballsGroup
+    var textsGroup = executeData.textsGroup
     
-        //Set layers to export
-        var num = 0;
-    
-        for (var ball = 0; ball < ballsGroup.layers.length; ball++) {
-            
-            ballsGroup.layers[ball].visible = true;
-            
-            for (var number = 0; number < numberAmount; number++) {
-                
-                titleElement.textItem.contents = num;
-                Progress.Message(selectedFolder + "/ball " + num);
-                var zero = num < 10 ? "0" : "";
-                ExportPNG(selectedFolder.fullName, "ball_" + zero + num);
-                Progress.Increment();
-                
-                num++;
-            }
-            
-            ballsGroup.layers[ball].visible = false;
-        }
-}
+    //Set layers visibility
+    ballsGroup.visible = true
+    textsGroup.visible = true
 
-function ExecuteMultiText(){
-    //Implement!!!
+    for (i = 0; i < ballsGroup.layers.length; i++)
+    {
+        ballsGroup.layers[i].visible = false
+        textsGroup.layers[i].visible = false
+    }
+
+    //Set layers to export
+    var ballNumber = 0
+
+    for (var i = 0; i < ballsGroup.layers.length; i++) {
+        
+        ballsGroup.layers[i].visible = true
+        textsGroup.layers[i].visible = true
+        
+        for (var j = 0; j < 10; j++) {
+            
+            textsGroup.layers[i].textItem.contents = ballNumber
+            var ballName = "ball_" + (ballNumber < 10 ? "0" : "") + ballNumber //ball_01.png
+            ExportPNG(selectedFolder.fullName, ballName)
+            Progress.Message(selectedFolder + "/" + ballName)
+            Progress.Increment()
+            
+            ballNumber++
+        }
+        
+        ballsGroup.layers[i].visible = false
+        textsGroup.layers[i].visible = false
+    }
 }
 
 function ExportPNG(selectedFolder, fileName)
 {
-    // Confirm the document has already been saved and so has a path to use
-    try 
-    {
-        app.activeDocument.save()
-    } catch(e) {
-        alert("Could not export PNG as the document is not saved.\nPlease save and try again.")
-        return
-    }
-    
-    saveFile = File(selectedFolder + "/" + fileName + ".png");
+    saveFile = File(selectedFolder + "/" + fileName + ".png")
 
-    var pngOpts = new ExportOptionsSaveForWeb;
+    var pngOpts = new ExportOptionsSaveForWeb
 
     pngOpts.format = SaveDocumentType.PNG  
-    pngOpts.PNG8 = false;
-    pngOpts.transparency = true;    
-    pngOpts.interlaced = false;
-    pngOpts.quality = 100;
+    pngOpts.PNG8 = false
+    pngOpts.transparency = true    
+    pngOpts.interlaced = false
+    pngOpts.quality = 100
     
-    activeDocument.exportDocument(new File(saveFile),ExportType.SAVEFORWEB,pngOpts);
+    activeDocument.exportDocument(new File(saveFile),ExportType.SAVEFORWEB,pngOpts)
+}
+
+function Progress(initialMessage){
+    
+    var window = new Window("palette", "Exporting Files", undefined, { closeButton: false })
+    var text = window.add("statictext", undefined, initialMessage)
+    text.preferredSize = [450,-1]
+    var bar = window.add("progressbar", undefined, "")
+    bar.preferredSize = [450,-1]
+
+    Progress.Close = function(){
+        window.close()
+    }
+    Progress.Increment = function(){
+        bar.value ++
+        window.update()
+    }
+    Progress.Message = function(message){
+        text.text = message
+    }
+    Progress.Set = function(steps){
+        bar.value = 0
+        bar.minvalue = 0
+        bar.maxvalue = steps
+        window.update()
+    }
+    window.show()
+    window.update()
 }
