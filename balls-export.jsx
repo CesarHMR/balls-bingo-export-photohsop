@@ -32,14 +32,14 @@
     //Checkbox
     group = panel.add("group")
     group.alignment = "left"
-    group.add("statictext", undefined, "Unique text for each group")
+    group.add("statictext", undefined, "Multiple text element")
     var checkbox = group.add ("checkbox", undefined)
 
     //Buttons
     group = window.add("group")
     group.alignment = "center"
-    var btnOk = group.add("button", undefined, "Ok")
     var btnCancel = group.add("button", undefined, "Cancel")
+    var btnOk = group.add("button", undefined, "Export")
 
     //Buttons interactivity
     btnFolderOutput.onClick = function(){

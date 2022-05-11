@@ -1,24 +1,25 @@
 ### Bingo Balls Export
-The script was created to automate the exporting of bingo balls sprites for video bingo games using Photoshop. Running this script allows to export a large number of balls sprites at once, instead exporting one by one, or using any other inconsistent method. Easy to setting up and to use.
-
-#### Seting up the Script
-First, we are setting up the script to make easier to use it multiple times. Start by dowloading the *ball-export.jsx* file and place it in a folder of your choice, just remenber where it is saved. Now, inside Photoshop, let's create an action. If the actions window is not displayed, just go to "windows", then "actions". Click in the "plus" icon to add a new action, name it as you like and press "Record". From now on the Photoshop is recording every single action, so **click only the buttons that are required!** Click "*Files*" > "*Script*" > "*Browser*", search and select the *jsx* file. The script will start running, but just click "Cancel". Finally click the "square icon" in the actions window to stop recording. Click in the "hamburguer menu" in the top right corner of the action window and turn on the "Button Mode".
-
-![image-1.png](./images/image-1.png) ![image-2.png](./images/image-2.png)
-![image-3.png](./images/image-3.png) ![image-4.png](./images/image-4.png)
-
-And its done! Every time you click this action, the script is going to run without the need to find it every time.
-
+This script was created to automate the exporting of bingo balls sprites using Photoshop. It allows to export a large number of sprites at once, instead exporting one by one, or using any other inconsistent method. It is easy to set up and to use!
 
 #### Setting up the Layers
-Some requirement are needed for the process to work:
-- The text layer that goes over tha balls must to be named as "Text" (case sensitive);
-- All balls variants must be in a group named "Balls" (case sensitive) and the group must be under the text;
+It is possible to export all groups of balls using the same text element(1), or export each group with its own text element(2).
+![image-7.png](./images/image-7.png)(1)
+![image-9.png](./images/image-9.png)(2)
 
-![image-5.png](./images/image-5.png)
+Indifferent to the method, the script need to reconize 2 important elements: the balls and the text element.
+- All balls must be inside a group named as "Balls";
+- All texts elements (in case '1' just one element) must be inside a group named as "Texts";
 
-When executing the script, a window with two field will appear:
-- The **Folder** field -> choose the folder where all balls sprites are going to be exported;
-- The **Balls amount per variant** -> each ball layer is considered a variant, the toppest ball layer will be the fist variant of balls, the second will be the second variant and so on. So if you choose the "amount of ball per variant" to be 10, the 1-9 balls gonna be blue (first variant), the 10-19 balls gonna be red (second variant)... Keep 10 by default.
+![image-6.png](./images/image-6.png)(1)
+![image-8.png](./images/image-8.png)(2)
 
-By completing the fields, the process will start and the files will be exported to the selected folder.
+When executing the script, a window with two fields will appear:
+- The **Folder** field: choose the folder where all balls sprites are going to be exported;
+- The **Multiple Text** field: if unchecked, the first text element inside the 'Texts' group will be exported with every ball. If checked, each ball group will be exported using a unique text element, so the amount of texts elements inside the 'Texts' group, must be the same amount of balls inside the 'Balls' group;
+
+![image-10.png](./images/image-10.png)(1)
+![image-11.png](./images/image-11.png)(2)
+
+By completing the fields and pressing the 'Export' button, the process will begin and the files will be exported to the selected folder.
+
+![image-12.png](./images/image-12.png)
